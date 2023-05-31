@@ -55,10 +55,6 @@ const getBlogData = async (req, res) => {
   try {
     let query = req.query;
     
-    let authId = req.decodedToken.authorId;
-    if (query["authorId"] != authId && query["authorId"])
-      return res.status(404).send({ status: false, msg: "blog not found" });
-    query.authorId = authId;
     query.isDeleted = false;
     query.isPublished = true;
     query.deletedAt=null;

@@ -26,25 +26,13 @@ const validAuthor = async function (req, res, next) {
       if (!validAuthor) {
         return res.status(404).send({ status: false, msg: "Author does not exist" });
       }
-      next();
-    } else {
-      const data = req.body;
-      let authId = req.decodedToken.authorId;
-      if (!authId) {
-        // Handle the case where req.decodedToken.authorId is undefined
-        // You can choose to handle it based on your specific requirements
-        // For example, you can set a default authorId or return an error message
-        return res.status(400).send({ status: false, msg: "Author ID is missing" });
-      }
-      data["authorId"] = authId;
-      const blog = await blogModel.create(data);
-      return res.status(201).send({ status: true, data: blog });
     }
-  } catch (error) {
+      next();
+  } 
+  catch (error) {
     return res.status(500).send({ status: false, msg: "age" });
   }
 }
-
 
 
 const validBlogId = async function (req, res, next) {
