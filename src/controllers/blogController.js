@@ -1,29 +1,35 @@
-
+const mongoose = require('mongoose');
+const objectId = mongoose.Types.ObjectId
 const blogModel = require("../models/blogModel");
 const moment = require("moment");
-
+ 
+const isValidObjectId=function(objectId){
+  return mongoose.Types.ObjectId.isValid(objectId)
+}
 const createBlog = async function (req, res) {
   try {
     const { title, body, authorId, category, isPublished } = req.body;
     if (!title) {
-    return res.status(400).send({ status: false, message: "title is not present" });
-}
+      return res.status(400).send({ status: false, message: "Blog title is not present" });
+    }
 
-if (!body) {
-  return res.status(400).send({ status: false, message: "body is not present" });
-}
+    if (!body) {
+      return res.status(400).send({ status: false, message: "Body body is not present" });
+    }
 
-if (!category) {
-  return res.status(400).send({ status: false, message: "category is not present" });
-}
+    if(!isValid(authorId)){
+     return res.status(400).send({status:false,message:"Author Id is required"})
+    }
 
-if (typeof isPublished != "boolean") {
-  return res.status(400).send({status: false,message: "isPublished should be false or true"});
-}
+    if(!isValidObjectId(authorId)){
+     return res.status(400).send({status:false,message:`${authorId} is not a valid authorId`})
 
-if (isPublished == true) {
-  req.body.publishedAt = moment().format();
-}
+    }
+
+    if (!category) {
+      return res.status(400).send({ status: false, message: "category is not present" });
+    }
+
     const data = req.body;
     const authdata = data.authorId;
     let authId = req.decodedToken.authorId;
@@ -40,8 +46,7 @@ if (isPublished == true) {
     const blog = await blogModel.create(data);
     res.status(201).send({ status: true, data: blog });
   } catch (error) {
-    console.log(error)
-    res.status(400).send({ status: false, msg: error.message });
+    res.status(500).send({ status: false, msg: error.message });
   }
 };
 
@@ -49,13 +54,15 @@ if (isPublished == true) {
 const getBlogData = async (req, res) => {
   try {
     let query = req.query;
+    
     let authId = req.decodedToken.authorId;
     if (query["authorId"] != authId && query["authorId"])
       return res.status(404).send({ status: false, msg: "blog not found" });
     query.authorId = authId;
     query.isDeleted = false;
     query.isPublished = true;
-     
+    query.deletedAt=null;
+
     let doc = await blogModel.find(query);
     if (doc.length == 0) {
       return res.status(404).send({ status: false, msg: "Document not found" });
@@ -78,10 +85,10 @@ const updatedBlog = async (req, res) => {
       isPublished: true,
       publishedAt: `${moment()}`,
     };
-    let reqBody=req.body;
+    let reqBody = req.body;
     reqBody.tags = reqBody.tags.filter(tag => tag.trim() !== '');
     reqBody.subcategory = reqBody.subcategory.filter(subcat => subcat.trim() !== '');
-   
+
     // Update the blog fields
     const updateBlog = await blogModel.findOneAndUpdate(
       { _id: blogId, isDeleted: false },

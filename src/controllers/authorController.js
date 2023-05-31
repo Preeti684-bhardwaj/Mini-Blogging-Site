@@ -2,7 +2,9 @@ const authorModel = require("../models/authorModel");
 const jwt = require("jsonwebtoken");
 const {isValid, isValidEmail, isValidRequest} = require("../validators/validator");
 
-
+const isValidTitle=function(title){
+  return ["Mr","Mrs","Miss"].indexOf(title)!==-1
+}
 // ===============================CreateAuthor=====================================================================================================
 
 const createAuthor = async (req, res)=>{
@@ -15,12 +17,6 @@ const createAuthor = async (req, res)=>{
     // using destructing for request body
     const {fname,lname,title,email,password}= req.body;
 
-    // request body should not have more than 5 keys as per authorSchema (edge Case handled)
-
-    if (Object.keys(requestBody).length > 5) {
-      return res.status(400).send({ status: false, message: "Invalid data entry inside request body" })
-  }
-
     if(!isValid(fname)){
       return res.status(400).send({status:false,message:"First name is required"})
     }
@@ -31,7 +27,7 @@ const createAuthor = async (req, res)=>{
     if(!isValid(title)){
      return res.status(400).send({status:false,message:'Title is required'})
     }
-    if (!["Mr", "Mrs", "Miss"].includes(title)) {
+    if (!isValidTitle(title)) {
         return res.status(400).send({ status: false, msg: "Title should contain Mr, Mrs, Miss" });
     }
 
@@ -59,6 +55,11 @@ const createAuthor = async (req, res)=>{
 
 const loginAuthor = async (req, res) =>{
   try{
+    const requestBody=req.body;
+    if(!isValidRequest(requestBody)){
+      return res.status(400).send({status:false,message:"Please provide author details"})
+    }
+
   let { email, password } = req.body;
 
   if(!isValid(email)){
@@ -74,15 +75,15 @@ const loginAuthor = async (req, res) =>{
 
   let emailAuthor = await authorModel.findOne({ email: email});
   if (!emailAuthor)
-    return res.status(400).send({ status: false, msg: "Email is not registered" });
+    return res.status(401).send({ status: false, msg: "Email is not registered" });
 
   let passAuthor = await authorModel.findOne({ email: email,password: password });
   if (!passAuthor)
-    return res.status(400).send({status: false,msg: "Email is registered but Password is not correct"});
+    return res.status(401).send({status: false,msg: "Email is registered but Password is not correct"});
 
-  let token = jwt.sign({ authorId: emailAuthor._id }, "blogging-group-10");
+  let token = await  jwt.sign({ authorId: emailAuthor._id }, "blogging-group-10");
   res.setHeader("x-api-key", token);
-  res.status(200).send({ status: true, data: { token: token } });
+  res.status(200).send({ status: true,message:"Author login successfull", data: { token: token } });
     }
     catch(err){
       res.status(500).send({status:false,error:err.message})

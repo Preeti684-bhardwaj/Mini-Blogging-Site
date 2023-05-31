@@ -4,8 +4,8 @@ const isValid = function (value) {
     return false;
 };
 
-const isValidRequest = function (object) {
-    return Object.keys(object).length > 0
+const isValidRequest = function (requestBody) {
+    return Object.keys(requestBody).length > 0
 }
 
 const isValidEmail = function (value) {

@@ -41,7 +41,7 @@ const validAuthor = async function (req, res, next) {
       return res.status(201).send({ status: true, data: blog });
     }
   } catch (error) {
-    return res.status(500).send({ status: false, msg: error.message });
+    return res.status(500).send({ status: false, msg: "age" });
   }
 }
 
@@ -72,19 +72,19 @@ const validBlogId = async function (req, res, next) {
     }
 };
 
-const validPassword = (req, res, next) => {
-  try {
-    let password = req.body.password;
-    for (let i = 0; i < password.length; i++) {
-      if (password[i] == " ")
-        return res.status(400).send({status: false,msg: "provide valid password (password does not contain SPACE)"});
-    }
-    next();
-  } catch (error) {
-    return res.status(500).send({ status: false, msg: error.message });
-  }
-};
+// const validPassword = (req, res, next) => {
+//   try {
+//     let password = req.body.password;
+//     for (let i = 0; i < password.length; i++) {
+//       if (password[i] == " ")
+//         return res.status(400).send({status: false,msg: "provide valid password (password does not contain SPACE)"});
+//     }
+//     next();
+//   } catch (error) {
+//     return res.status(500).send({ status: false, msg: error.message });
+//   }
+// };
 
 
 
-module.exports = {validAuthor,validBlogId,uniqueEmail,validPassword};
+module.exports = {validAuthor,validBlogId,uniqueEmail};
