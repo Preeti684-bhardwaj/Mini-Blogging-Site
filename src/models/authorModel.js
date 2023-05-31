@@ -1,6 +1,6 @@
 const mongoose=require('mongoose');
 
-const authorModel=new mongoose.Schema({
+const authorSchema=new mongoose.Schema({
     fname:{
         type: String,
         required:true,
@@ -18,12 +18,16 @@ const authorModel=new mongoose.Schema({
     },
     email:{
         type:String,
-        required:true
+        required:true,
+        trim:true,
+        unique:true
     },
     password:{
         type:String,
-        required:true
+        required:true,
+        unique:true,
+        trim:true
     }
 },{timestamps:true});
 
-module.exports=mongoose.model('authorData',authorModel);
+module.exports=mongoose.model('Author',authorSchema);

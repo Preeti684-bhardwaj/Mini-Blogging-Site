@@ -4,6 +4,26 @@ const moment = require("moment");
 
 const createBlog = async function (req, res) {
   try {
+    const { title, body, authorId, category, isPublished } = req.body;
+    if (!title) {
+    return res.status(400).send({ status: false, message: "title is not present" });
+}
+
+if (!body) {
+  return res.status(400).send({ status: false, message: "body is not present" });
+}
+
+if (!category) {
+  return res.status(400).send({ status: false, message: "category is not present" });
+}
+
+if (typeof isPublished != "boolean") {
+  return res.status(400).send({status: false,message: "isPublished should be false or true"});
+}
+
+if (isPublished == true) {
+  req.body.publishedAt = moment().format();
+}
     const data = req.body;
     const authdata = data.authorId;
     let authId = req.decodedToken.authorId;
@@ -20,6 +40,7 @@ const createBlog = async function (req, res) {
     const blog = await blogModel.create(data);
     res.status(201).send({ status: true, data: blog });
   } catch (error) {
+    console.log(error)
     res.status(400).send({ status: false, msg: error.message });
   }
 };

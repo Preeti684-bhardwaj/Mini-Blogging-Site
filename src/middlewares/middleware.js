@@ -2,25 +2,6 @@
 const authorModel = require('../models/authorModel');
 const blogModel = require('../models/blogModel');
 
-const validEmail = async function (req, res, next) {
-
-    try {
-        const email = req.body.email;
-
-        const pattern =
-          /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
-        const found = email.match(pattern);
-        if (!found) {
-            return res.status(400).send({ status: false, msg: "You give wrong Email format" })
-        }
-        next()
-    }
-    catch (error) {
-        return res.status(500).send({ status: false, msg: error.message })
-    }
-    
-}
-
   const uniqueEmail=async function(req,res,next){
     try {
       const uEmail = req.body.email;
@@ -32,23 +13,7 @@ const validEmail = async function (req, res, next) {
     } catch (error) {
       return res.status(500).send({ status: false, msg: error.message });
     }
-
   }
-
-const reqBodyCheck = async function (req, res, next) {
-    try {
-        let data = req.body;
-        if (Object.keys(data).length === 0) {
-          return res
-            .status(400)
-            .send({ status: false, msg: "Request body is not present" });
-        }
-        next()
-    }
-    catch (error) {
-        return res.status(500).send({ status: false, msg: error.message })
-    }
-}
 
 const validAuthor = async function (req, res, next) {
   try {
@@ -124,39 +89,27 @@ const validPassword = (req, res, next) => {
     return res.status(500).send({ status: false, msg: error.message });
   }
 };
-const missingFieldAuthor= async (req, res,next) => {
-  try{const { fname, lname, title, email, password } = req.body;
-    // handling mandatory field name is present in req.body
-    if (!fname || !lname || !title || !email || !password) {
-      return res.status(400).send({ status: false, msg: "Missing Required Field" });
-    }
-  next();}
-    catch(err){
-      return res.status(500).send({ status: false, msg: err.message });
-    }
-}
-const missingFieldBlog= async (req, res,next) => {
-  try{const { title, body, category } = req.body;
-    // handling mandatory field name is present in req.body
-    if (!title || !body || !category) {
-      return res.status(400).send({ status: false, msg: "Missing Required Field" });
-    }
-  next();
-}
-    catch(err){
-      return res.status(500).send({ status: false, msg: err.message });
-    }
-}
+
+// const missingFieldBlog= async (req, res,next) => {
+//   try{const { title, body, category } = req.body;
+//     // handling mandatory field name is present in req.body
+//     if (!title || !body || !category) {
+//       return res.status(400).send({ status: false, msg: "Missing Required Field" });
+//     }
+//   next();
+// }
+//     catch(err){
+//       return res.status(500).send({ status: false, msg: err.message });
+//     }
+// }
 
 
 
 
 
 module.exports = {
-  reqBodyCheck,
   validAuthor,
   validBlogId,
-  validEmail,
   uniqueEmail,
-  validPassword,missingFieldAuthor,missingFieldBlog
+  validPassword
 };
