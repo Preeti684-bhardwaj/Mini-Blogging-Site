@@ -1,6 +1,6 @@
 const authorModel = require("../models/authorModel");
 const jwt = require("jsonwebtoken");
-const {isValid, isValidEmail, isValidRequest, regexNameValidator } = require("../validators/validator");
+const {isValid, isValidEmail, isValidRequest} = require("../validators/validator");
 
 
 // ===============================CreateAuthor=====================================================================================================
@@ -21,11 +21,11 @@ const createAuthor = async (req, res)=>{
       return res.status(400).send({ status: false, message: "Invalid data entry inside request body" })
   }
 
-    if(!isValid(fname) || !regexNameValidator(fname)){
+    if(!isValid(fname)){
       return res.status(400).send({status:false,message:"First name is required"})
     }
 
-    if(!isValid(lname) || !regexNameValidator(fname)){
+    if(!isValid(lname)){
       return res.status(400).send({status:false,message:"Last name is required"})     
     }
     if(!isValid(title)){
@@ -45,9 +45,6 @@ const createAuthor = async (req, res)=>{
     if(!isValid(password)){
       res.status(400).send({status:false,message:"Password is required"})
     }
-  //   if (!isValidPassword(password)) {
-  //     return res.status(400).send({ status: false, message: "Enter a valid password" })
-  // }
 
     const data={fname:fname,lname:lname,title:title,email:email,password:password}
     const author = await authorModel.create(data);
@@ -64,20 +61,24 @@ const loginAuthor = async (req, res) =>{
   try{
   let { email, password } = req.body;
 
-  if (!email) {
-    return res.status(400).send({status:false,msg:"email is required"});
+  if(!isValid(email)){
+    return res.status(400).send({status:false,message:"Email is required"})
   }
-  if (!password) {
-    return res.status(400).send({status:false,msg:"password is required"});
+  if(!isValidEmail(email)){
+    return res.status(400).send({status:false,message:"Enter a valid email address"})
+  }
+
+  if(!isValid(password)){
+    res.status(400).send({status:false,message:"Password is required"})
   }
 
   let emailAuthor = await authorModel.findOne({ email: email});
   if (!emailAuthor)
-    return res.status(404).send({ status: false, msg: "Email is not registered" });
+    return res.status(400).send({ status: false, msg: "Email is not registered" });
 
   let passAuthor = await authorModel.findOne({ email: email,password: password });
   if (!passAuthor)
-    return res.status(404).send({status: false,msg: "Email is registered but Password is not correct"});
+    return res.status(400).send({status: false,msg: "Email is registered but Password is not correct"});
 
   let token = jwt.sign({ authorId: emailAuthor._id }, "blogging-group-10");
   res.setHeader("x-api-key", token);

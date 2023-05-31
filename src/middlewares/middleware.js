@@ -77,12 +77,7 @@ const validPassword = (req, res, next) => {
     let password = req.body.password;
     for (let i = 0; i < password.length; i++) {
       if (password[i] == " ")
-        return res
-          .status(400)
-          .send({
-            status: false,
-            msg: "provide valid password (password does not contain SPACE)",
-          });
+        return res.status(400).send({status: false,msg: "provide valid password (password does not contain SPACE)"});
     }
     next();
   } catch (error) {
@@ -90,26 +85,6 @@ const validPassword = (req, res, next) => {
   }
 };
 
-// const missingFieldBlog= async (req, res,next) => {
-//   try{const { title, body, category } = req.body;
-//     // handling mandatory field name is present in req.body
-//     if (!title || !body || !category) {
-//       return res.status(400).send({ status: false, msg: "Missing Required Field" });
-//     }
-//   next();
-// }
-//     catch(err){
-//       return res.status(500).send({ status: false, msg: err.message });
-//     }
-// }
 
 
-
-
-
-module.exports = {
-  validAuthor,
-  validBlogId,
-  uniqueEmail,
-  validPassword
-};
+module.exports = {validAuthor,validBlogId,uniqueEmail,validPassword};
