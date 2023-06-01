@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const objectId = mongoose.Types.ObjectId
 const blogModel = require("../models/blogModel");
 const moment = require("moment");
+const {isValid, isValidEmail, isValidRequest} = require("../validators/validator");
  
 const isValidObjectId=function(objectId){
   return mongoose.Types.ObjectId.isValid(objectId)
@@ -65,6 +66,7 @@ const getBlogData = async (req, res) => {
     }
     res.status(200).send({ status: true, msg: doc });
   } catch (error) {
+    console.log(error)
     return res.status(500).send({ error: error.message });
   }
 };
