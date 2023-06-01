@@ -54,7 +54,7 @@ const createauthor = async function (req,res) {
     const data = req.body;
     const isEmail = await AuthorModel.findOne({ email: data.email });
     if (isEmail) {
-      return res.status(400).send({ status: false, message: "Email address is already registered" });
+      return res.status(409).send({ status: false, message: "Email address is already registered" });
     }
     
     const createdata = await AuthorModel.create(data);
