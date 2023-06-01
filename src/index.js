@@ -1,21 +1,21 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const route = require('./route/route.js');
-
+const bodyParser = require('body-parser')
+const route = require('./route/route')
+const app= express();
 const mongoose = require('mongoose');
-const app = express();
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended:true }));
 
-mongoose.connect('mongodb+srv://bhardwajpreeti684:YQyZDhVN4TvtvSub@cluster0.cwtrept.mongodb.net/bloggingSitemini-DB', {
-    useNewUrlParser: true
+
+mongoose.connect("mongodb+srv://jasmeendesai2597:Uy1yQhrmV3pWAsYj@cluster0.wi2wctr.mongodb.net/group3Database",{
+    useNewUrlParser : true
 })
-.then( () => console.log("MongoDb is connected"))
-.catch ( err => console.log(err) )
+.then(()=>console.log("you are now connected to MongoDB"))
+.catch(err=> console.log(err))
 
-app.use('/', route);
+app.use('/',route);
 
-app.listen(process.env.PORT || 3000, function () {
-    console.log('Express app running on port ' + (process.env.PORT || 3000))
+app.listen(process.env.PORT||3000,function(){
+    console.log('the app is running at port '+(process.env.PORT||3000));
 });
