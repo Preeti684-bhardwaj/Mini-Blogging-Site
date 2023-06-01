@@ -1,51 +1,52 @@
+const jwt = require("jsonwebtoken");
+const blogModel = require("../model/blogmodel")
 
-const authorModel = require('../models/authorModel');
-const blogModel = require('../models/blogModel');
 
+const authentication = async function (req, res, next) {
+    try {
+        const token = req.headers["x-api-key"];
+        if (!token) {
+            return res.status(404).send({ status: false, message: "error ,token is missing" });
+        }
 
-const validAuthor = async function (req, res, next) {
-  try {
-    let authId = req.body.authorId;
-    if (authId) {
-      if (authId.length !== 24) {
-        return res.status(400).send({ status: false, msg: "Provide a valid author ID" });
-      }
-      let validAuthor = await authorModel.findById({ _id: authId });
-      if (!validAuthor) {
-        return res.status(404).send({ status: false, msg: "Author does not exist" });
-      }
+            const decodedToken = jwt.verify(token, 'functionUp-tech1');
+            req.decodedToken = decodedToken.authorId;
+            next();
+    } catch (error) {
+      return res.status(401).send({ status: false, message: "token is invalid" });
+       
     }
-      next();
-  } 
-  catch (error) {
-    return res.status(500).send({ status: false, msg: "age" });
-  }
 }
 
 
-const validBlogId = async function (req, res, next) {
+const authorization = async function (req, res, next) {
     try {
-      let id = req.params.blogId;
-      if (id.length !== 24) {
-        return res
-          .status(400)
-          .send({ status: false, msg: "provide valid blog ID" });
+      const blogId = req.params.blogId;
+  
+      const blog = await blogModel.findById(blogId);
+      if (!blog) {
+        return res.status(404).send({ status: false, message: "Blog not found" });
       }
-      let validBlog = await blogModel.findById({ _id:id});
-      if (!validBlog) {
-        return res.status(404).send({ status: false, msg: "invalid blog ID" });
+  
+      if (blog.isDeleted) {
+        return res.status(400).send({ status: false , message : "Blog is already deleted"});
       }
-       let validBlog1 = await blogModel.findOne({ _id: id, isDeleted: false });
-      if (!validBlog1) {
-        return res
-          .status(404)
-          .send({ status: false, msg: "Blog is already deleted" });
+  
+      const userLoggedIn = req.decodedToken;
+      const userToBeModified = blog.authorId;
+  
+      if (userToBeModified != userLoggedIn) {
+        return res.status(403).send({ status: false, message: "User logged in is not allowed to modify the requested user's data" });
       }
+  
       next();
+    } catch (error) {
+      return res.status(500).send({ status: false, message: error.message });
     }
-    catch (error) {
-        return res.status(500).send({ status: false, msg: error.message })
-    }
-};
+  };
 
-module.exports = {validAuthor,validBlogId};
+
+module.exports.authentication = authentication
+module.exports.authorization = authorization
+
+

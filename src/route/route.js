@@ -1,22 +1,52 @@
 const express = require('express');
-const authorCtrl=require('../controllers/authorController');
-const blogCtrl=require('../controllers/blogController');
-const mid = require('../middlewares/middleware')
-const authmid=require('../middlewares/authmid')
+const route = express.Router();
 
-const router = express.Router();
+const authorcontroller = require("../controller/authorcontroller")
+
+const blogController = require("../controller/blogController")
+
+const middleware = require("../middleware/middleware")
 
 
+//create author
 
-router.post('/authors',authorCtrl.createAuthor);//aditya 
-router.post('/blogs',authmid.authenticationMid,mid.validAuthor, blogCtrl.createBlog);//Aditya 
-router.get('/blogs' ,authmid.authenticationMid,blogCtrl.getBlogData);//pallavi 
+route.post("/authors",authorcontroller.createauthor)
 
-router.put("/blogs/:blogId", mid.validBlogId,authmid.authenticationMid,authmid.authorizationMid, blogCtrl.updatedBlog);//preeti
+//author/login
 
-router.delete('/blogs/:blogId',mid.validBlogId,authmid.authenticationMid,authmid.authorizationMid,blogCtrl.deleteBlogByPathParam);//swarnendu 
-router.delete("/blogs", authmid.authenticationMid, blogCtrl.deleteBlogByQueryParam);//swarnendu
-router.post("/login",authorCtrl.loginAuthor);
- 
- 
-module.exports = router; 
+route.post("/login", authorcontroller.authorLogin)
+
+//create blogs
+
+route.post("/blogs", 
+    middleware.authentication, 
+    blogController.createBlog)
+
+//get blogs
+
+route.get("/blogs", 
+    middleware.authentication, 
+    blogController.getBlog)
+
+//update blog
+route.put("/blogs/:blogId", 
+    middleware.authentication, 
+    middleware.authorization, 
+    blogController.updateBlog);
+
+//delete blog by Id
+route.delete("/blogs/:blogId", 
+    middleware.authentication, 
+    middleware.authorization, 
+    blogController.deleteuser);
+
+//delete query
+route.delete("/blogs", 
+    middleware.authentication, 
+    blogController.deletequery);
+
+route.use("*",(req,res)=>{
+    return res.status(404).send({status : true, message :"invalid urls"})
+})
+
+module.exports = route;
