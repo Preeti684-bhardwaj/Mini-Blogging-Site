@@ -10,7 +10,7 @@ const authenticationMid = function (req, res, next) {
  
     const decodedToken=jwt.verify(token, "blogging-group-10");
     if(!decodedToken){
-        return res.status(400).send({status:false,msg:"token is invalid"})
+        return res.status(401).send({status:false,msg:"token is invalid"})
     } 
     req.decodedToken=decodedToken; 
     next(); 

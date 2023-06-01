@@ -2,18 +2,6 @@
 const authorModel = require('../models/authorModel');
 const blogModel = require('../models/blogModel');
 
-  const uniqueEmail=async function(req,res,next){
-    try {
-      const uEmail = req.body.email;
-      let checkEmail = await authorModel.findOne({ email: uEmail });
-      if (checkEmail) {
-        return res.status(401).send({status:false,msg:"emailId already exist"});
-      }
-      next();
-    } catch (error) {
-      return res.status(500).send({ status: false, msg: error.message });
-    }
-  }
 
 const validAuthor = async function (req, res, next) {
   try {
@@ -60,4 +48,4 @@ const validBlogId = async function (req, res, next) {
     }
 };
 
-module.exports = {validAuthor,validBlogId,uniqueEmail};
+module.exports = {validAuthor,validBlogId};

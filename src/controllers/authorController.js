@@ -24,7 +24,7 @@ const createAuthor = async (req, res)=>{
     if(!lname){
       return res.status(400).send({status:false,message:"Last name is required"})     
     }
-    if(!title){
+    if(!isValid(title)){
      return res.status(400).send({status:false,message:'Title is required'})
     }
     if (!isValidTitle(title)) {
@@ -73,10 +73,6 @@ const loginAuthor = async (req, res) =>{
   if(!isValid(password)){
     res.status(400).send({status:false,message:"Password is required"})
   }
-
-  let emailAuthor = await authorModel.findOne({ email: email});
-  if (!emailAuthor)
-    return res.status(401).send({ status: false, msg: "Email is not registered" });
 
   let passAuthor = await authorModel.findOne({ email: email,password: password });
   if (!passAuthor)
