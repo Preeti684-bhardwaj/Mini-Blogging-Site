@@ -1,11 +1,11 @@
 const express = require('express');
 const route = express.Router();
 
-const authorcontroller = require("../controller/authorcontroller")
+const authorcontroller = require("../controllers/authorController")
 
-const blogController = require("../controller/blogController")
+const blogController = require("../controllers/blogController")
 
-const middleware = require("../middleware/middleware")
+const middleware = require("../middlewares/middleware")
 
 
 //create author

@@ -1,5 +1,5 @@
-const blogModel = require("../model/blogmodel")
-const validator = require('../util/validator')
+const blogModel = require("../models/blogModel")
+const validator = require('../validators/validator')
 
 const createBlog = async (req, res) => {
     try {
