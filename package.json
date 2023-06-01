@@ -1,7 +1,7 @@
 {
   "name": "blogsite",
   "version": "1.0.0",
-  "description": "\"blog site project\"",
+  "description": "blog site project",
   "main": "index.js",
   "scripts": {
     "start": "nodemon src/index.js",
