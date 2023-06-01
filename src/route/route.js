@@ -8,7 +8,7 @@ const router = express.Router();
 
 
 
-router.post('/authors',mid.uniqueEmail,authorCtrl.createAuthor);//aditya 
+router.post('/authors',authorCtrl.createAuthor);//aditya 
 router.post('/blogs',authmid.authenticationMid,mid.validAuthor, blogCtrl.createBlog);//Aditya 
 router.get('/blogs' ,authmid.authenticationMid,blogCtrl.getBlogData);//pallavi 
 
