@@ -17,21 +17,21 @@ const createAuthor = async (req, res)=>{
     // using destructing for request body
     const {fname,lname,title,email,password}= req.body;
 
-    if(!isValid(fname)){
+    if(!fname){
       return res.status(400).send({status:false,message:"First name is required"})
     }
 
-    if(!isValid(lname)){
+    if(!lname){
       return res.status(400).send({status:false,message:"Last name is required"})     
     }
-    if(!isValid(title)){
+    if(!title){
      return res.status(400).send({status:false,message:'Title is required'})
     }
     if (!isValidTitle(title)) {
         return res.status(400).send({ status: false, msg: "Title should contain Mr, Mrs, Miss" });
     }
 
-    if(!isValid(email)){
+    if(!email){
       return res.status(400).send({status:false,message:"Email is required"})
     }
     if(!isValidEmail(email)){
@@ -41,9 +41,10 @@ const createAuthor = async (req, res)=>{
     if(!isValid(password)){
       res.status(400).send({status:false,message:"Password is required"})
     }
+    const duplicateEmail = await authorModel.findOne({email:email})
+    if(duplicateEmail) return res.status(400).send({status:false,message:`${email} is already exist`})
 
-    const data={fname:fname,lname:lname,title:title,email:email,password:password}
-    const author = await authorModel.create(data);
+    const author = await authorModel.create(req.body);
     res.status(201).send({ status: true,message:"Author registered successfully", data: author });
   } 
   catch (error) {
