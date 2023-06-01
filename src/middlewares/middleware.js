@@ -62,4 +62,4 @@ const validBlogId = async function (req, res, next) {
 
 
 
-module.exports = {validAuthor,validBlogId,uniqueEmail};
+module.exports = {validAuthor,validBlogId};
