@@ -1,10 +1,9 @@
 const authorModel = require("../models/authorModel");
 const jwt = require("jsonwebtoken");
-const validator=require('validator')
 const {isValid, isValidEmail, isValidRequest} = require("../validators/validator");
 
 const isValidTitle=function(title){
-  return ["Mr","Mrs","Miss"].includes(title)
+  return ["Mr","Mrs","Miss"].indexOf(title)!==-1
 }
 // ===============================CreateAuthor=====================================================================================================
 
@@ -35,7 +34,7 @@ const createAuthor = async (req, res)=>{
     if(!isValid(email)){
       return res.status(400).send({status:false,message:"Email is required"})
     }
-    if(!validator.isEmail(email)){
+    if(!isValidEmail(email)){
       return res.status(400).send({status:false,message:"Enter a valid email address"})
     }
 
@@ -48,6 +47,7 @@ const createAuthor = async (req, res)=>{
     res.status(201).send({ status: true,message:"Author registered successfully", data: author });
   } 
   catch (error) {
+    console.log(error)
     res.status(500).send({ status: false, msg: error.message });
   }
 };

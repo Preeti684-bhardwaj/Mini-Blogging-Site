@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const objectId = mongoose.Types.ObjectId
 const blogModel = require("../models/blogModel");
 const moment = require("moment");
+const {isValid, isValidEmail, isValidRequest} = require("../validators/validator");
  
 const isValidObjectId=function(objectId){
   return mongoose.Types.ObjectId.isValid(objectId)
@@ -59,51 +60,13 @@ const getBlogData = async (req, res) => {
     query.isPublished = true;
     query.deletedAt=null;
 
-    const { authorId, category, tags, subcategory } = queryParams;
-
-    if (!isValid(authorId)) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Author id is required" });
-    }
-    if (authorId) {
-      if (!isValidObjectId(authorId)) {
-        return res.status(400).send({
-          status: false,
-          message: `authorId is not valid.`,
-        });
-      }
-    }
-
-    if (!isValid(category)) {
-      return res.status(400).send({
-        status: false,
-        message: "Category cannot be empty while fetching.",
-      });
-    }
-
-    if (!isValid(tags)) {
-      return res.status(400).send({
-        status: false,
-        message: "tags cannot be empty while fetching.",
-      });
-    }
-    // console.log(tags)
-    // console.log(subcategory)
-
-    if (!isValid(subcategory)) {
-      return res.status(400).send({
-        status: false,
-        message: "subcategory cannot be empty while fetching.",
-      });
-    }
-
     let doc = await blogModel.find(query);
     if (doc.length == 0) {
       return res.status(404).send({ status: false, msg: "Document not found" });
     }
     res.status(200).send({ status: true, msg: doc });
   } catch (error) {
+    console.log(error)
     return res.status(500).send({ error: error.message });
   }
 };
