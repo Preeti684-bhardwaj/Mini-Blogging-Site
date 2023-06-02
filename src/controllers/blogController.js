@@ -1,5 +1,6 @@
+const { isValidObjectId } = require("mongoose")
 const blogModel = require("../models/blogModel")
-const validator = require('../validators/validator')
+const validator = require('../utils/validator')
 
 const createBlog = async (req, res) => {
     try {
@@ -96,16 +97,30 @@ const createBlog = async (req, res) => {
 
 const getBlog = async function (req, res) {
     try {
-
+        const filterQuery={isDeleted:false,deletedAt:null,isPublished:true};
         const filter = req.query
-        filter.isDeleted = false
-        filter.isPublished = true
+        if(isValidRequestBody(filter)){
+        const {authorId,category,tags,subcategory}=filter
+        }
+        if(isValid(authorId) &isValidObjectId(authorId)){
+          filterQuery['authorId']=authorId;
+        }
+         if(isValid(category)){
+            filterQuery['category']=category.trim();
+          }
+          if(isValid(tags)){
+            const tagArr=tags.trim().split(',').map(tag=>tag.trim())
+            filterQuery['tags']={$all:tagArr};
+          }
+          if(isValid(subcategory)){
+            const subCatArr=subcategory.trim().split(',').map(subcat=>subcat.trim())
+            filterQuery['subcategory']={$all:subCatArr};
+          }
+        const data = await blogModel.find(filterQuery)
 
-        const data = await blogModel.find(filter)
+        if (Array.isArray(data) && data.length == 0) return res.status(404).send({ status: false, message: "No blog found" })
 
-        if (data.length == 0) return res.status(404).send({ status: false, message: "data not found" })
-
-        return res.status(200).send({ status: true, message: "Blogs list", data: data })
+        return res.status(201).send({ status: true, message: "Blogs list", data: data })
     } catch (error) {
         return res.status(500).send({ status: false, message: error.message })
     }

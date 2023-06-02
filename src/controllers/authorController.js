@@ -1,6 +1,6 @@
 const AuthorModel = require("../models/authorModel")
 const jwt = require("jsonwebtoken")
-const validator = require('../validators/validator')
+const validator = require('../utils/validator')
 
 
 //-------------------------------------------------
