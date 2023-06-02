@@ -67,9 +67,6 @@ const createauthor = async function (req,res) {
   }
 };
 
-module.exports = { createauthor };
-
-
 //-------------------------------------------------
 
 // author login function
@@ -81,7 +78,7 @@ const authorLogin = async function (req, res) {
   }
       const { email, password } = req.body;
 
-      if (!email ||!password) {
+      if (!email || !password) {
         return res.status(400).send({ status: false, message: "Please enter email and password" });
       }
 
