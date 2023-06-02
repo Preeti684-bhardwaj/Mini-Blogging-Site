@@ -1,6 +1,6 @@
 const blogModel = require("../models/blogModel")
 const validator = require('../validators/validator')
-const authorModel=require('../models/authorModel')
+
 const createBlog = async (req, res) => {
     try {
 
@@ -16,7 +16,7 @@ const createBlog = async (req, res) => {
         if(!title) {
             return res.status(400).send({ status: false, message: "title is required" });
         }
-        if(!validator.isValid) {
+        if(!validator.isValid(title)) {
             return res.status(400).send({ status: false, message: "enter valid title" })
         }
 
@@ -25,7 +25,7 @@ const createBlog = async (req, res) => {
         if(!body) {
             return res.status(400).send({ status: false, message: "body is required" });
         }
-        if(!validator.isValid) {
+        if(!validator.isValid(body)) {
             return res.status(400).send({ status: false, message: "enter valid body" })
         }
 
@@ -34,7 +34,7 @@ const createBlog = async (req, res) => {
             return res.status(400).send({ status: false, message: "authorId is required" })
         };
 
-        const authorIdData = await authorModel.findById(authorId)
+        const authorIdData = await AuthorModel.findById(authorId)
         if (!authorIdData) {
             return res.status(404).send({ status: false, message: 'Author not found' })
         }
@@ -51,8 +51,8 @@ const createBlog = async (req, res) => {
         }
           
         if (Array.isArray(tags)) {
-            const isValid = tags.every(value => typeof value === "string" && value.length > 0);
-            if (!isValid) {
+            const istagValid = tags.every(value => typeof value === "string" && value.length > 0);
+            if (!istagValid) {
               return res.status(400).send({ status: false, message: "Tags should be an array of non-empty strings" });
             }
         }
@@ -62,7 +62,7 @@ const createBlog = async (req, res) => {
         if(!category) {
             return res.status(400).send({ status: false, message: "category is required" });
         }
-        if(!validator.category) {
+        if(!validator.isValid(category)) {
             return res.status(400).send({ status: false, message: "enter valid category" })
         }
 
@@ -73,8 +73,8 @@ const createBlog = async (req, res) => {
         }
           
         if (Array.isArray(subcategory)) {
-            const isValid = subcategory.every(value => typeof value === "string" && value.length > 0);
-            if (!isValid) {
+            const issubcategoryValid = subcategory.every(value => typeof value === "string" && value.length > 0);
+            if (!issubcategoryValid) {
               return res.status(400).send({ status: false, message: "subcategory should be an array of non-empty strings" });
             }
         }
@@ -190,5 +190,6 @@ const deletequery = async function (req, res) {
 
 
 module.exports = {updateBlog, createBlog, getBlog, deletequery, deleteuser}
+
 
 
