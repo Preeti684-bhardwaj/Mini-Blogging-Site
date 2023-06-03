@@ -1,5 +1,6 @@
 const blogModel = require("../models/blogModel")
 const validator = require('../utils/validator')
+const AuthorModel=require('../models/authorModel')
 
 const createBlog = async (req, res) => {
     try {
@@ -30,6 +31,11 @@ const createBlog = async (req, res) => {
         }
 
         // // authorId validation
+
+        if (!validator.isValidObjectId(authorId)) {
+            return res.status(400).send({status: false,message: `${authorId} is not a valid author id`});
+        }
+
         if (!authorId) {
             return res.status(400).send({ status: false, message: "authorId is required" })
         };
@@ -37,24 +43,6 @@ const createBlog = async (req, res) => {
         const authorIdData = await AuthorModel.findById(authorId)
         if (!authorIdData) {
             return res.status(404).send({ status: false, message: 'Author not found' })
-        }
-
-        // auhtorization
-        if(authorId !== req.decodedToken) {
-            return res.status(403).send({status: false, message: 'user is not authorised'})
-        }
-
-        // tags validation
-       
-        if (tags === "" || (Array.isArray(tags) && tags.length === 0)) {
-            return res.status(400).send({ status: false, message: "Tags cannot be an empty array or string" });
-        }
-          
-        if (Array.isArray(tags)) {
-            const istagValid = tags.every(value => typeof value === "string" && value.length > 0);
-            if (!istagValid) {
-              return res.status(400).send({ status: false, message: "Tags should be an array of non-empty strings" });
-            }
         }
 
         // category validation
@@ -66,19 +54,6 @@ const createBlog = async (req, res) => {
             return res.status(400).send({ status: false, message: "enter valid category" })
         }
 
-        // subcategory validation
-
-        if (subcategory === "" || (Array.isArray(subcategory) && subcategory.length === 0)) {
-            return res.status(400).send({ status: false, message: "subcategory cannot be an empty array or string" });
-        }
-          
-        if (Array.isArray(subcategory)) {
-            const issubcategoryValid = subcategory.every(value => typeof value === "string" && value.length > 0);
-            if (!issubcategoryValid) {
-              return res.status(400).send({ status: false, message: "subcategory should be an array of non-empty strings" });
-            }
-        }
-
         data.isPublished = data.isPublished ? data.isPublished : false
         data.publishedAt = data.isPublished ? new Date() : null
     
@@ -86,6 +61,7 @@ const createBlog = async (req, res) => {
         return res.status(201).send({ status: true, data: blogData })
 
     } catch (error) {
+        console.log(error)
         return res.status(500).send({ status: false, message: error.message })
     }
 }
@@ -96,30 +72,19 @@ const createBlog = async (req, res) => {
 
 const getBlog = async function (req, res) {
     try {
-        const filterQuery={isDeleted:false,deletedAt:null,isPublished:true};
-        const filter = req.query
-        if(isValidRequestBody(filter)){
-        const {authorId,category,tags,subcategory}=filter
-        }
-        if(isValid(authorId) &isValidObjectId(authorId)){
-          filterQuery['authorId']=authorId;
-        }
-         if(isValid(category)){
-            filterQuery['category']=category.trim();
-          }
-          if(isValid(tags)){
-            const tagArr=tags.trim().split(',').map(tag=>tag.trim())
-            filterQuery['tags']={$all:tagArr};
-          }
-          if(isValid(subcategory)){
-            const subCatArr=subcategory.trim().split(',').map(subcat=>subcat.trim())
-            filterQuery['subcategory']={$all:subCatArr};
-          }
-        const data = await blogModel.find(filterQuery)
+        const filter = req.query;
 
-        if (Array.isArray(data) && data.length == 0) return res.status(404).send({ status: false, message: "No blog found" })
-
-        return res.status(201).send({ status: true, message: "Blogs list", data: data })
+        filter.isDeleted = false;
+        filter.isPublished = true;
+    
+        const data = await blogModel.find(filter);
+    
+        if (data.length == 0)
+          return res.status(404).send({ status: false, message: "data not found" });
+    
+        return res
+          .status(200)
+          .send({ status: true, message: "Blogs list", data: data });
     } catch (error) {
         return res.status(500).send({ status: false, message: error.message })
     }
@@ -136,13 +101,14 @@ const updateBlog = async function (req, res) {
           }
 
         const data = req.body
-        if(!req.body || Object.keys(req.body).length === 0){
+        if(!validator.isValidRequestBody(data)){
             return res.status(400).send({ status: false, message: "No data is present in body" });
         }
         
         const updatedData = await blogModel.findOneAndUpdate(
             { _id: blogId },
-            { $push: { tags: data.tags, subcategory: data.subcategory }, title: data.title, body: data.body, isPublished: true, publishedAt: new Date() },
+            { $push: { tags: data.tags, subcategory: data.subcategory },
+             title: data.title, body: data.body, isPublished: true, publishedAt: new Date() },
             { new: true });
 
         return res.status(200).send({ status: true, message: "Blog updated successfully", data: updatedData });
