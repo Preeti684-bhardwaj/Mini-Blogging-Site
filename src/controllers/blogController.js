@@ -61,7 +61,6 @@ const createBlog = async (req, res) => {
         return res.status(201).send({ status: true, data: blogData })
 
     } catch (error) {
-        console.log(error)
         return res.status(500).send({ status: false, message: error.message })
     }
 }
@@ -96,7 +95,7 @@ const getBlog = async function (req, res) {
 const updateBlog = async function (req, res) {
     try {
         const blogId = req.params.blogId
-        if(isValid(blogId) &isValidObjectId(blogId)){
+        if(validator.isValid(blogId) && validator.isValidObjectId(blogId)){
             blogId['blogId']=blogId;
           }
 

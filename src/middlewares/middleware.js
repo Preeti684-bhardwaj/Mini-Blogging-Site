@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const blogModel = require("../models/blogModel")
+const validator=require('../utils/validator')
 
 
 const authentication = async function (req, res, next) {
@@ -23,7 +24,7 @@ const authorization = async function (req, res, next) {
     try {
       const blogId = req.params.blogId;
       if (!validator.isValidObjectId(blogId)) {
-        return res.status(401).send({status: false,message: `${blogId} is not a valid author id`});
+        return res.status(401).send({status: false,message: `${blogId} is not a valid id`});
        }
   
       const blog = await blogModel.findById(blogId);

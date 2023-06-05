@@ -27,7 +27,7 @@ const createauthor = async function (req,res) {
     }
   
     if (!title || !enm.includes(title)) {
-        return res.status(400).send({ status: false, message: "title is required" });
+        return res.status(400).send({ status: false, message: "title is required and emun belong to Mr,Mrs,Miss" });
     }
 
     if (!validator.isValid(title)) {
