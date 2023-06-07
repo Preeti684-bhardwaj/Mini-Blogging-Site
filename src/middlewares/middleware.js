@@ -1,54 +1,66 @@
-const jwt = require("jsonwebtoken");
-const blogModel = require("../models/blogModel")
-const validator = require("../utils/validator");
+const jwt = require('jsonwebtoken');
+const { SECRETE_KEY } = require('../../config')
+const authorModel = require('../models/authorModel')
+const blogModel = require('../models/blogModel')
+const mongoose = require('mongoose')
 
-const authentication = async function (req, res, next) {
+
+
+const authenticationFun = async (req, res, next) => {
     try {
-        const token = req.headers["x-api-key"];
-        if (!token) {
-            return res.status(400).send({ status: false, message: "error ,token is missing" });
-        }
-
-            const decodedToken = jwt.verify(token, 'functionUp-tech1'); 
-            req.decodedToken = decodedToken.authorId;
-            next();
+        const token = req.headers['x-api-key']
+        if (!token) return res.status(401).send({ status: false, message: 'Please provide token' })
+        const decoded = jwt.verify(token, SECRETE_KEY)
+        req.authorId = decoded.authorId
+        next()
     } catch (error) {
-      return res.status(401).send({ status: false, message: "token is invalid" });
-       
+        res.status(404).send({ status: false, message: error.message })
     }
 }
 
-const authorization = async function (req, res, next) {
+const authorHandel = async (req, res, next) => {
     try {
-      const blogId = req.params.blogId;
-       if (!validator.isValidObjectId(blogId)) {
-        return res.status(401).send({status: false,message: `${blogId} is not a valid blog id`,
-      });
-    }
-      const blog = await blogModel.findById(blogId);
-      if (!blog) {
-        return res.status(404).send({ status: false, message: "Blog not found" });
-      }
-  
-      if (blog.isDeleted) {
-        return res.status(400).send({ status: false , message : "Blog is already deleted"});
-      }
-  
-      const userLoggedIn = req.decodedToken; 
-      const userToBeModified = blog.authorId;
-  
-      if (userToBeModified != userLoggedIn) {
-        return res.status(403).send({ status: false, message: "User logged in is not allowed to modify the requested user's data" });
-      }
-  
-      next();
+        const authorId = req.body.authorId
+        const token = req.headers['x-api-key']
+        if (!token) return res.status(401).send({ status: false, message: 'Please provide token' })
+        if (!authorId) {
+            return res.status(400).send({ status: false, message: "Author id is missing" })
+        } else {
+            if (!mongoose.Types.ObjectId.isValid(authorId)) {
+                return res.status(400).send({ status: false, message: ' blog id is not valid' })
+            }
+            else {
+                const author = await authorModel.findById(authorId)
+                if (!author || author === null) {
+                    return res.status(404).send({ status: false, message: 'not found author' })
+                } else {
+                    next()
+                }
+            }
+        }
     } catch (error) {
-      return res.status(500).send({ status: false, message: error.message });
+        res.status(404).send({ status: false, message: error.message })
     }
-  };
+}
+
+const blogHandel = async (req, res, next) => {
+    try {
+        const blogId = req.params.blogId
+        const authorId = req.authorId
+        const token = req.headers['x-api-key']
+        if (!token) return res.status(401).send({ status: false, message: 'Please provide token' })
+        if (!mongoose.Types.ObjectId.isValid(blogId)) return res.status(400).send({ status: false, message: ' blog id is not valid' })
+        const blog = await blogModel.findById(blogId)
+        if (!blog || blog == null) {
+            res.status(404).send({ status: false, message: 'not found blog' })
+        } else {
+            req.blogId = blogId
+            next()
+        }
+    } catch (error) {
+        res.status(404).send({ status: false, message: error.message })
+    }
+}
 
 
-module.exports.authentication = authentication
-module.exports.authorization = authorization
-
-
+module.exports = { authenticationFun, authorHandel, blogHandel }

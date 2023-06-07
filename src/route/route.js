@@ -1,52 +1,15 @@
-const express = require('express');
-const route = express.Router();
+const router = require('express').Router();
+const {createBlog, getBlog, updateBlog, deleteBlogById, deleteBlogByQuery} = require('../controllers/blogController');
+const { createAuthor, authorLogin } = require('../controllers/authorController')
+const {authenticationFun, authorHandel, blogHandel} = require('../middlewares/middleware');
+const { authorization } = require('../middlewares/validator');
 
-const authorcontroller = require("../controllers/authorController")
+router.post('/authors', createAuthor)
+router.post('/login', authorLogin)
+router.post('/blogs',authorHandel ,authenticationFun, createBlog)
+router.get('/blogs',authenticationFun ,getBlog)
+router.put('/blogs/:blogId',blogHandel, authenticationFun,authorization,updateBlog)
+router.delete('/blogs/:blogId',blogHandel ,authenticationFun,authorization, deleteBlogById)
+router.delete('/blogs', authenticationFun, deleteBlogByQuery)
 
-const blogController = require("../controllers/blogController")
-
-const middleware = require("../middlewares/middleware")
-
-
-//create author
-
-route.post("/authors",authorcontroller.createauthor)
-
-//author/login
-
-route.post("/login", authorcontroller.authorLogin)
-
-//create blogs
-
-route.post("/blogs", 
-    middleware.authentication, 
-    blogController.createBlog)
-
-//get blogs
-
-route.get("/blogs", 
-    middleware.authentication, 
-    blogController.getBlog)
-
-//update blog
-route.put("/blogs/:blogId", 
-    middleware.authentication, 
-    middleware.authorization, 
-    blogController.updateBlog);
-
-//delete blog by Id
-route.delete("/blogs/:blogId", 
-    middleware.authentication, 
-    middleware.authorization, 
-    blogController.deleteuser);
-
-//delete query
-route.delete("/blogs", 
-    middleware.authentication, 
-    blogController.deletequery);
-
-route.use("*",(req,res)=>{
-    return res.status(404).send({status : true, message :"invalid urls"})
-})
-
-module.exports = route;
+module.exports = router;
