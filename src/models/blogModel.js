@@ -10,6 +10,7 @@ const blog= new mongoose.Schema({
       },
       body: {
         type: String,
+        
         required: true
       },
       authorId: {
@@ -35,7 +36,7 @@ const blog= new mongoose.Schema({
         default: false
       },
       deletedAt: {
-        type: Date,
+        type: Date, //
         default : null
       },
       isPublished: {
@@ -49,5 +50,5 @@ const blog= new mongoose.Schema({
       
 },{timestamps:true})
 
-module.exports= mongoose.model('blog',blog)
+module.exports= mongoose.model('Blog',blog)
 

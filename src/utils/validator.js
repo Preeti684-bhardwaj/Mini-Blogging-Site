@@ -1,4 +1,5 @@
-const mongoose=require('mongoose')
+const mongoose = require('mongoose')
+
 const isValid = function (value) {
     if (typeof value === "undefined" || value === null) return false;
     if (typeof value === "string" && value.trim().length === 0) return false;
@@ -12,7 +13,8 @@ const isValid = function (value) {
     return email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)
   };
   const isValidObjectId = function (objectId) {
-    return mongoose.Types.ObjectId.isValid(objectId)
-}
+    return mongoose.Types.ObjectId.isValid(objectId);
+  };
+  
 
 module.exports = {isValid, isValidRequestBody, isValidEmail,isValidObjectId}

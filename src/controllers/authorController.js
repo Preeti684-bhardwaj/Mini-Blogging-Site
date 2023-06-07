@@ -27,7 +27,7 @@ const createauthor = async function (req,res) {
     }
   
     if (!title || !enm.includes(title)) {
-        return res.status(400).send({ status: false, message: "title is required and emun belong to Mr,Mrs,Miss" });
+        return res.status(400).send({ status: false, message: "title is required" });
     }
 
     if (!validator.isValid(title)) {
@@ -67,6 +67,9 @@ const createauthor = async function (req,res) {
   }
 };
 
+
+
+
 //-------------------------------------------------
 
 // author login function
@@ -75,10 +78,10 @@ const authorLogin = async function (req, res) {
     try {
       if(!validator.isValidRequestBody(req.body) ){
         return res.status(400).send({ status: false, message: "No data is present in body" });
-  }
+      }
       const { email, password } = req.body;
 
-      if (!email || !password) {
+      if (!email ||!password) {
         return res.status(400).send({ status: false, message: "Please enter email and password" });
       }
 
@@ -100,9 +103,7 @@ const authorLogin = async function (req, res) {
       if (password) {
         const token = jwt.sign({ authorId: userLogin._id }, 'functionUp-tech1');
 
-        // res.status(200).setHeader("x-api-key", token)
-
-        return res.status(201).send({ status: true, data: { token: token } })
+        return res.status(200).send({ status: true, data: { token: token } })
       } else {
         return res.status(401).send({status: false,message: "not a authenticate user"})
       }

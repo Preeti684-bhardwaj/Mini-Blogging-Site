@@ -1,14 +1,14 @@
 const blogModel = require("../models/blogModel")
+const AuthorModel = require("../models/authorModel")
 const validator = require('../utils/validator')
-const AuthorModel=require('../models/authorModel')
 
 const createBlog = async (req, res) => {
     try {
 
         let data = req.body
-        let {title,body,tags,category,subcategory,authorId} = data
+        let {title,body,category,authorId} = data
 
-        if(!validator.isValidRequestBody){
+        if(!validator.isValidRequestBody(data)){
             return res.status(400).send({ status: false, message: "No data is present in body" });
         }
         
@@ -31,20 +31,19 @@ const createBlog = async (req, res) => {
         }
 
         // // authorId validation
-
-        if (!validator.isValidObjectId(authorId)) {
-            return res.status(400).send({status: false,message: `${authorId} is not a valid author id`});
-        }
-
         if (!authorId) {
             return res.status(400).send({ status: false, message: "authorId is required" })
         };
-
+        if (!validator.isValidObjectId(authorId)) {
+            return res.status(400).send({status: false,message: `${authorId} is not a valid author id`
+        });
+        }
+       
         const authorIdData = await AuthorModel.findById(authorId)
         if (!authorIdData) {
             return res.status(404).send({ status: false, message: 'Author not found' })
         }
-
+        
         // category validation
 
         if(!category) {
@@ -71,19 +70,18 @@ const createBlog = async (req, res) => {
 
 const getBlog = async function (req, res) {
     try {
-        const filter = req.query;
 
-        filter.isDeleted = false;
-        filter.isPublished = true;
+        const filter = req.query
     
-        const data = await blogModel.find(filter);
-    
-        if (data.length == 0)
-          return res.status(404).send({ status: false, message: "data not found" });
-    
-        return res
-          .status(200)
-          .send({ status: true, message: "Blogs list", data: data });
+        filter.isDeleted = false 
+        filter.isPublished = true
+        
+       
+        const data = await blogModel.find(filter)
+
+        if (data.length == 0) return res.status(404).send({ status: false, message: "data not found" })
+
+        return res.status(200).send({ status: true, message: "Blogs list", data: data })
     } catch (error) {
         return res.status(500).send({ status: false, message: error.message })
     }
@@ -95,9 +93,6 @@ const getBlog = async function (req, res) {
 const updateBlog = async function (req, res) {
     try {
         const blogId = req.params.blogId
-        if(validator.isValid(blogId) && validator.isValidObjectId(blogId)){
-            blogId['blogId']=blogId;
-          }
 
         const data = req.body
         if(!validator.isValidRequestBody(data)){
@@ -105,9 +100,8 @@ const updateBlog = async function (req, res) {
         }
         
         const updatedData = await blogModel.findOneAndUpdate(
-            { _id: blogId },
-            { $push: { tags: data.tags, subcategory: data.subcategory },
-             title: data.title, body: data.body, isPublished: true, publishedAt: new Date() },
+            { _id: blogId }, 
+            { $push: { tags: data.tags, subcategory: data.subcategory }, title: data.title, body: data.body, isPublished: true, publishedAt: new Date() },
             { new: true });
 
         return res.status(200).send({ status: true, message: "Blog updated successfully", data: updatedData });
@@ -141,7 +135,7 @@ const deletequery = async function (req, res) {
     try {
         const filter = req.query;
         const userLoggedIn = req.decodedToken //unique
-        filter.isDeleted =false;
+        filter.isDeleted =false; 
         const blog = await blogModel.find(filter);  //
      
         if (blog.length === 0) {
@@ -172,6 +166,5 @@ const deletequery = async function (req, res) {
 
 
 module.exports = {updateBlog, createBlog, getBlog, deletequery, deleteuser}
-
 
 

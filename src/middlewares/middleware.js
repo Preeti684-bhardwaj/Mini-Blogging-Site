@@ -1,16 +1,15 @@
 const jwt = require("jsonwebtoken");
 const blogModel = require("../models/blogModel")
-const validator=require('../utils/validator')
-
+const validator = require("../utils/validator");
 
 const authentication = async function (req, res, next) {
     try {
         const token = req.headers["x-api-key"];
         if (!token) {
-            return res.status(404).send({ status: false, message: "error ,token is missing" });
+            return res.status(400).send({ status: false, message: "error ,token is missing" });
         }
 
-            const decodedToken = jwt.verify(token, 'functionUp-tech1');
+            const decodedToken = jwt.verify(token, 'functionUp-tech1'); 
             req.decodedToken = decodedToken.authorId;
             next();
     } catch (error) {
@@ -19,14 +18,13 @@ const authentication = async function (req, res, next) {
     }
 }
 
-
 const authorization = async function (req, res, next) {
     try {
       const blogId = req.params.blogId;
-      if (!validator.isValidObjectId(blogId)) {
-        return res.status(401).send({status: false,message: `${blogId} is not a valid id`});
-       }
-  
+       if (!validator.isValidObjectId(blogId)) {
+        return res.status(401).send({status: false,message: `${blogId} is not a valid blog id`,
+      });
+    }
       const blog = await blogModel.findById(blogId);
       if (!blog) {
         return res.status(404).send({ status: false, message: "Blog not found" });
@@ -36,7 +34,7 @@ const authorization = async function (req, res, next) {
         return res.status(400).send({ status: false , message : "Blog is already deleted"});
       }
   
-      const userLoggedIn = req.decodedToken;
+      const userLoggedIn = req.decodedToken; 
       const userToBeModified = blog.authorId;
   
       if (userToBeModified != userLoggedIn) {
